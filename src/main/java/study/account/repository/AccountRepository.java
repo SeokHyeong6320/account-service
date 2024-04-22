@@ -6,4 +6,5 @@ import study.account.domain.Account;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
+
 }

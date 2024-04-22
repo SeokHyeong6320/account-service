@@ -32,7 +32,8 @@ public class Account extends BaseEntity{
     private LocalDateTime registeredAt;
     private LocalDateTime unRegisteredAt;
 
-    public void createAccount(User user) {
+
+    public void setUser(User user) {
         this.user = user;
         user.getAccounts().add(this);
     }
