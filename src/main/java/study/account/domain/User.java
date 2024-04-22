@@ -10,6 +10,7 @@ import java.util.List;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class User extends BaseEntity{
 
     @Id @GeneratedValue

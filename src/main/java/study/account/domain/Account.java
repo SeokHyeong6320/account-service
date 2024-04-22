@@ -2,13 +2,15 @@ package study.account.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import study.account.type.AccountStatus;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class Account extends BaseEntity{
 
     @Id @GeneratedValue
@@ -33,6 +35,14 @@ public class Account extends BaseEntity{
     public void createAccount(User user) {
         this.user = user;
         user.getAccounts().add(this);
+    }
+
+    public void plusBalance(long amount) {
+        this.balance += amount;
+    }
+
+    public void minusBalance(long amount) {
+        this.balance -= amount;
     }
 
 }
