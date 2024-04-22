@@ -13,7 +13,6 @@ import study.account.dto.AccountDto;
 import study.account.service.AccountService;
 
 import static java.time.LocalDateTime.now;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,17 +23,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockBean(JpaMetamodelMappingContext.class)
 class AccountControllerTest {
 
-    @MockBean
-    private AccountService accountService;
+    @MockBean private AccountService accountService;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
     @Test
-    void accountControllerTest() throws Exception {
+    void successCreateAccount() throws Exception {
         // given
         given(accountService.createAccount(anyLong(), anyLong()))
                 .willReturn(AccountDto.builder()
@@ -44,6 +40,8 @@ class AccountControllerTest {
                         .registeredAt(now())
                         .build());
 
+        // when
+        // then
         mockMvc.perform(post("/account")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
@@ -53,14 +51,10 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.accountNumber")
                         .value("12345"))
                 .andDo(print());
-
-
-        // when
-
-
-        // then
-
     }
+
+
+
 
 
 

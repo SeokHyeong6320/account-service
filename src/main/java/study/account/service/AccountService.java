@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.account.domain.Account;
-import study.account.domain.CreateAccount;
 import study.account.domain.User;
 import study.account.dto.AccountDto;
 import study.account.exception.AccountException;
@@ -15,7 +14,6 @@ import study.account.type.AccountStatus;
 import study.account.type.ErrorCode;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @Transactional
@@ -32,9 +30,10 @@ public class AccountService {
 
         validationAccountCount(findUser);
 
+
         Account account = Account.builder()
                 .user(findUser)
-                .accountNumber(Integer.parseInt(getLastAccountNumber()) + 1 + "")
+                .accountNumber(getNewAccountNumber())
                 .accountStatus(AccountStatus.IN_USE)
                 .balance(initialBalance)
                 .registeredAt(LocalDateTime.now())
@@ -45,13 +44,11 @@ public class AccountService {
         return AccountDto.fromEntity(account);
     }
 
-    private String getLastAccountNumber() {
-        List<String> result = em.createQuery("select a.accountNumber " +
-                        " from Account a " +
-                        " order by a.accountNumber desc", String.class)
-                .getResultList();
-
-        return result.stream().findFirst().orElse("1000000000");
+    private String getNewAccountNumber() {
+        return accountRepository.findFirstByOrderByIdDesc()
+                .map(account ->
+                        (Integer.parseInt(account.getAccountNumber())) + 1 + "")
+                .orElse("1000000000");
     }
 
     private void validationAccountCount(User findUser) {

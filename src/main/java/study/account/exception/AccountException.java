@@ -1,8 +1,9 @@
 package study.account.exception;
 
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import study.account.type.ErrorCode;
 
+@Getter
 public class AccountException extends RuntimeException{
 
     private ErrorCode errorCode;
