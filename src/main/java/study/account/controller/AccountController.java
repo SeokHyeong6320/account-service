@@ -1,13 +1,14 @@
 package study.account.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import study.account.domain.AccountInfo;
 import study.account.domain.CloseAccount;
 import study.account.domain.CreateAccount;
 import study.account.service.AccountService;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +30,16 @@ public class AccountController {
 
         return CloseAccount.Response.fromDto(accountService
                 .closeAccount(request.getUserId(), request.getAccountNumber()));
+    }
+
+    @GetMapping("/account")
+    public List<AccountInfo> getAccountByUserId(@RequestParam Long userId) {
+
+        return accountService.getAccountList(userId).stream()
+                .map(accountDto -> AccountInfo.builder()
+                        .accountNumber(accountDto.getAccountNumber())
+                        .balance(accountDto.getBalance()).build())
+                .collect(Collectors.toList());
     }
 
 }

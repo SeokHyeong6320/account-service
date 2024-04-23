@@ -1,6 +1,7 @@
 package study.account.service;
 
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Literal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.account.domain.Account;
@@ -12,7 +13,9 @@ import study.account.repository.UserRepository;
 import study.account.type.AccountStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static study.account.type.ErrorCode.*;
 
@@ -100,6 +103,20 @@ public class AccountService {
         if (!Objects.equals(userId, account.getUser().getId())) {
             throw new AccountException(NOT_MATCH_USER_AND_ACCOUNT);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<AccountDto> getAccountList(Long userId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new AccountException(NO_USER));
+
+        for (Account account : findUser.getAccounts()) {
+            System.out.println(account.getAccountNumber() + " " + account.getBalance());
+        }
+
+        return findUser.getAccounts().stream()
+                .map(AccountDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
 
