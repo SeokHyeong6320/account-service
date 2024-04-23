@@ -1,5 +1,7 @@
 package study.account.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,11 +15,15 @@ import java.time.LocalDateTime;
 @Builder
 public class AccountDto {
 
+    @NotBlank
     private Long userId;
+    @NotBlank
+    @Size(min = 10, max = 10)
     private String accountNumber;
 
     private Long balance;
 
+    @NotBlank
     private LocalDateTime registeredAt;
 
     public static AccountDto fromEntity(Account account) {

@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AccountService {
 
-    private final EntityManager em;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
 
@@ -29,7 +28,6 @@ public class AccountService {
                 .orElseThrow(() -> new AccountException(ErrorCode.NO_USER));
 
         validationAccountCount(findUser);
-
 
         Account account = Account.builder()
                 .user(findUser)

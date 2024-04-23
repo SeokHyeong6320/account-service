@@ -1,5 +1,6 @@
 package study.account.domain;
 
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,10 @@ public class CreateAccount {
     @AllArgsConstructor
     public static class Request {
 
+        @NotBlank
         private Long userId;
+
+        @NotBlank
         private Long initialBalance;
 
     }
@@ -24,7 +28,11 @@ public class CreateAccount {
     @Builder
     public static class Response {
 
+        @NotBlank
         private Long userId;
+
+        @NotBlank
+        @Size(min = 10, max = 10)
         private String accountNumber;
         private LocalDateTime registeredAt;
 
