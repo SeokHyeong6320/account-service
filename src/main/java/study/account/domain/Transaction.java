@@ -5,6 +5,8 @@ import lombok.*;
 import study.account.type.TransactionResultType;
 import study.account.type.TransactionType;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter @Setter
 @AllArgsConstructor
@@ -16,21 +18,28 @@ public class Transaction {
     @Column(name = "transaction_indexid")
     private Long id;
 
+    @Column(name = "transaction_id", updatable = false)
+    private String transactionId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Account account;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")
     private TransactionType transactionType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transactionResult_type")
+    private TransactionResultType transactionResultType;
 
     @Column(name = "transaction_amount")
     private Long amount;
     @Column(name = "balanceSnapshot")
     private Long balanceSnapshot;
 
-    @Enumerated
-    @Column(name = "transactionResult_type")
-    private TransactionResultType transactionResultType;
+
+
+    private LocalDateTime transactedAt;
 
     public void cancel() {
         this.account.minusBalance(this.amount);

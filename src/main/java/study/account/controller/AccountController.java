@@ -11,12 +11,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/account")
 @RequiredArgsConstructor
 public class AccountController {
 
     private final AccountService accountService;
 
-    @PostMapping("/account")
+    @PostMapping
     public CreateAccount.Response createAccount
             (@RequestBody CreateAccount.Request request) {
 
@@ -24,7 +25,7 @@ public class AccountController {
                 .createAccount(request.getUserId(), request.getInitialBalance()));
     }
 
-    @DeleteMapping("/account")
+    @DeleteMapping
     public CloseAccount.Response closeAccount
             (@RequestBody CloseAccount.Request request) {
 
@@ -32,7 +33,7 @@ public class AccountController {
                 .closeAccount(request.getUserId(), request.getAccountNumber()));
     }
 
-    @GetMapping("/account")
+    @GetMapping
     public List<AccountInfo> getAccountsByUserId(@RequestParam Long userId) {
 
         return accountService.getAccountList(userId).stream()

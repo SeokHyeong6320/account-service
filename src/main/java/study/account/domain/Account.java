@@ -2,9 +2,12 @@ package study.account.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import study.account.exception.AccountException;
 import study.account.type.AccountStatus;
 
 import java.time.LocalDateTime;
+
+import static study.account.type.ErrorCode.*;
 
 @Entity
 @Getter
@@ -43,12 +46,16 @@ public class Account extends BaseEntity{
         this.unRegisteredAt = LocalDateTime.now();
     }
 
-    public void plusBalance(long amount) {
+    public void plusBalance(Long amount) {
         this.balance += amount;
     }
 
-    public void minusBalance(long amount) {
-        this.balance -= amount;
+    public void minusBalance(Long amount) {
+        if (this.balance >= amount) {
+            this.balance -= amount;
+        } else {
+            throw new AccountException(EXCEED_ACCOUNT_BALANCE);
+        }
     }
 
 }

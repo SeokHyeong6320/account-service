@@ -59,13 +59,13 @@ public class AccountService {
     }
 
     public AccountDto closeAccount(Long userId, String accountNumber) {
-        userRepository.findById(userId)
+        User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new AccountException(NO_USER));
 
         Account findAccount = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new AccountException(NO_ACCOUNT));
 
-        validateCloseAccount(userId, findAccount);
+        validateCloseAccount(findUser, findAccount);
 
         findAccount.closeAccount();
 
@@ -78,8 +78,8 @@ public class AccountService {
                 .build();
     }
 
-    private void validateCloseAccount(Long userId, Account account) {
-        isMatchUserAndAccount(userId, account);
+    private void validateCloseAccount(User findUser, Account account) {
+        isMatchUserAndAccount(findUser, account);
 
         isAccountClose(account);
 
@@ -94,12 +94,12 @@ public class AccountService {
 
     private void isAccountClose(Account account) {
         if (account.getAccountStatus() == AccountStatus.CLOSED) {
-            throw new AccountException(ACCOUNT_ALREADY_CLOSE);
+            throw new AccountException(ACCOUNT_ALREADY_CLOSED);
         }
     }
 
-    private void isMatchUserAndAccount(Long userId, Account account) {
-        if (!Objects.equals(userId, account.getUser().getId())) {
+    private void isMatchUserAndAccount(User findUser, Account account) {
+        if (!Objects.equals(findUser.getId(), account.getUser().getId())) {
             throw new AccountException(NOT_MATCH_USER_AND_ACCOUNT);
         }
     }
