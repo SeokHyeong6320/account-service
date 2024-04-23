@@ -20,13 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.time.LocalDateTime.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static study.account.type.AccountStatus.*;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceTest {
@@ -152,6 +153,138 @@ class AccountServiceTest {
         assertThat(exception.getErrorCode())
                 .isEqualTo(ErrorCode.EXCEED_ACCOUNT_COUNT);
     }
+
+    @Test
+    @DisplayName("계좌 해지 성공")
+    void successCloseAccount() throws Exception {
+        User user = User.builder()
+                .id(1L)
+                .accounts(Mockito.mock(List.class))
+                .build();
+
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(user));
+
+        given(accountRepository.findByAccountNumber(anyString()))
+                .willReturn(Optional.of(Account.builder()
+                                .id(2L)
+                                .user(user)
+                                .accountNumber("1000000012")
+                                .balance(0L)
+                                .registeredAt(now())
+                        .build()));
+
+
+        // when
+        ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
+
+        AccountDto accountDto = accountService
+                .closeAccount(1L, "1000000013");
+
+        // then
+        verify(accountRepository, times(1))
+                .save(captor.capture());
+
+        assertThat(captor.getValue().getAccountNumber())
+                .isEqualTo("1000000012");
+        assertThat(captor.getValue().getAccountStatus())
+                .isEqualTo(CLOSED);
+        assertThat(accountDto.getUnregisteredAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("계좌 해지 실패 - 유저 없음")
+    void failCloseAccount_noUser() throws Exception {
+        // given
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.empty());
+
+        // when
+        AccountException exception = assertThrows(AccountException.class,
+                () -> accountService.closeAccount(1L, "1000000000"));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NO_USER);
+    }
+
+    @Test
+    @DisplayName("계좌 해지 실패 - 헤당 계좌 없음")
+    void failCreateAccount_noAccount() throws Exception {
+        // given
+        User user = User.builder().id(1L).build();
+
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(user));
+
+        given(accountRepository.findByAccountNumber(anyString()))
+                .willReturn(Optional.empty());
+
+        // when
+        AccountException exception = assertThrows(AccountException.class,
+                () -> accountService.closeAccount(1L, "1000000000"));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NO_ACCOUNT);
+    }
+
+    @Test
+    @DisplayName("계좌 해지 실패 - 해당 유저의 계좌가 아님")
+    void failCreateAccount_noMatchUserAndAccount() throws Exception {
+        // given
+        User userA = User.builder().id(1L).build();
+        User userB = User.builder().id(2L).build();
+
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(userA));
+
+        given(accountRepository.findByAccountNumber(anyString()))
+                .willReturn(Optional.of(Account.builder()
+                        .id(2L)
+                        .user(userB)
+                        .accountNumber("1000000012")
+                        .balance(0L)
+                        .registeredAt(now())
+                        .build()));
+
+        // when
+        AccountException exception = assertThrows(AccountException.class,
+                () -> accountService
+                        .closeAccount(1L, "1000000000"));
+
+        // then
+        assertThat(exception.getErrorCode())
+                .isEqualTo(ErrorCode.NOT_MATCH_USER_AND_ACCOUNT);
+    }
+
+    @Test
+    @DisplayName("계좌 해지 실패 - 잔액 남음")
+    void failCreateAccount_stillHasBalance() throws Exception {
+        // given
+        User userA = User.builder().id(1L).build();
+
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(userA));
+
+        given(accountRepository.findByAccountNumber(anyString()))
+                .willReturn(Optional.of(Account.builder()
+                        .id(2L)
+                        .user(userA)
+                        .accountNumber("1000000012")
+                        .balance(1000L)
+                        .registeredAt(now())
+                        .build()));
+
+        // when
+        AccountException exception = assertThrows(AccountException.class,
+                () -> accountService
+                        .closeAccount(1L, "1000000000"));
+
+        // then
+        assertThat(exception.getErrorCode())
+                .isEqualTo(ErrorCode.ACCOUNT_STILL_HAS_BALANCE);
+    }
+
+
 
 
 }
