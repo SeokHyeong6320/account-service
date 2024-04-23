@@ -37,10 +37,10 @@ public class TransactionService {
             (Long userId, String accountNumber, Long amount) {
 
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountException(NO_USER));
+                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
 
         Account findAccount = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new AccountException(NO_ACCOUNT));
+                .orElseThrow(() -> new AccountException(ACCOUNT_NOT_FOUND));
 
         validateCreateTransaction(findUser, findAccount, amount);
 
@@ -54,7 +54,7 @@ public class TransactionService {
 
     public void saveFailTransaction(String accountNumber, Long amount) {
         Account findAccount = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new AccountException(NO_ACCOUNT));
+                .orElseThrow(() -> new AccountException(ACCOUNT_NOT_FOUND));
         saveTransaction(amount, findAccount, USE, F);
     }
 
@@ -77,7 +77,7 @@ public class TransactionService {
 
     private void validateCreateTransaction(User findUser, Account findAccount, Long amount) {
         if (!Objects.equals(findUser.getId(), findAccount.getUser().getId())) {
-            throw new AccountException(NOT_MATCH_USER_AND_ACCOUNT);
+            throw new AccountException(USER_AND_ACCOUNT_NOT_MATCH);
         }
         if (findAccount.getAccountStatus() == CLOSED) {
             throw new AccountException(ACCOUNT_ALREADY_CLOSED);

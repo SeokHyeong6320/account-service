@@ -54,7 +54,7 @@ public class Account extends BaseEntity{
         if (this.balance >= amount) {
             this.balance -= amount;
         } else {
-            throw new AccountException(EXCEED_ACCOUNT_BALANCE);
+            throw new AccountException(TRANSACTION_AMOUNT_EXCEED_BALANCE);
         }
     }
 

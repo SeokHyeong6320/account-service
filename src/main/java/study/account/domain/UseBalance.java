@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class UseBalance {
 
     @Getter
+    @AllArgsConstructor
     public static class Request {
 
         @NotBlank

@@ -131,7 +131,7 @@ class AccountServiceTest {
                 () -> accountService.createAccount(1L, 1000L));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(NO_USER);
+        assertThat(exception.getErrorCode()).isEqualTo(USER_NOT_FOUND);
     }
 
     @Test
@@ -152,7 +152,7 @@ class AccountServiceTest {
 
         // then
         assertThat(exception.getErrorCode())
-                .isEqualTo(EXCEED_ACCOUNT_COUNT);
+                .isEqualTo(ACCOUNT_COUNT_EXCEED);
     }
 
     @Test
@@ -206,7 +206,7 @@ class AccountServiceTest {
                         .closeAccount(1L, "1000000000"));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(NO_USER);
+        assertThat(exception.getErrorCode()).isEqualTo(USER_NOT_FOUND);
     }
 
     @Test
@@ -227,7 +227,7 @@ class AccountServiceTest {
                         .closeAccount(1L, "1000000000"));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(NO_ACCOUNT);
+        assertThat(exception.getErrorCode()).isEqualTo(ACCOUNT_NOT_FOUND);
     }
 
     @Test
@@ -256,7 +256,7 @@ class AccountServiceTest {
 
         // then
         assertThat(exception.getErrorCode())
-                .isEqualTo(NOT_MATCH_USER_AND_ACCOUNT);
+                .isEqualTo(USER_AND_ACCOUNT_NOT_MATCH);
     }
 
     @Test
@@ -284,7 +284,7 @@ class AccountServiceTest {
 
         // then
         assertThat(exception.getErrorCode())
-                .isEqualTo(ACCOUNT_STILL_HAS_BALANCE);
+                .isEqualTo(ACCOUNT_BALANCE_STILL_EXIST);
     }
 
     @Test
@@ -346,7 +346,7 @@ class AccountServiceTest {
                 () -> accountService.getAccountList(1L));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(NO_USER);
+        assertThat(exception.getErrorCode()).isEqualTo(USER_NOT_FOUND);
 
     }
 

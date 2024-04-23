@@ -28,7 +28,7 @@ public class AccountService {
 
     public AccountDto createAccount(Long userId, Long initialBalance) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountException(NO_USER));
+                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
 
         validateAccountCount(findUser);
 
@@ -54,16 +54,16 @@ public class AccountService {
 
     private void validateAccountCount(User findUser) {
         if (findUser.getAccounts().size() >= 10) {
-            throw new AccountException(EXCEED_ACCOUNT_COUNT);
+            throw new AccountException(ACCOUNT_COUNT_EXCEED);
         }
     }
 
     public AccountDto closeAccount(Long userId, String accountNumber) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountException(NO_USER));
+                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
 
         Account findAccount = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new AccountException(NO_ACCOUNT));
+                .orElseThrow(() -> new AccountException(ACCOUNT_NOT_FOUND));
 
         validateCloseAccount(findUser, findAccount);
 
@@ -88,7 +88,7 @@ public class AccountService {
 
     private void isAccountHasBalance(Account account) {
         if (account.getBalance() != 0) {
-            throw new AccountException(ACCOUNT_STILL_HAS_BALANCE);
+            throw new AccountException(ACCOUNT_BALANCE_STILL_EXIST);
         }
     }
 
@@ -100,14 +100,14 @@ public class AccountService {
 
     private void isMatchUserAndAccount(User findUser, Account account) {
         if (!Objects.equals(findUser.getId(), account.getUser().getId())) {
-            throw new AccountException(NOT_MATCH_USER_AND_ACCOUNT);
+            throw new AccountException(USER_AND_ACCOUNT_NOT_MATCH);
         }
     }
 
     @Transactional(readOnly = true)
     public List<AccountDto> getAccountList(Long userId) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountException(NO_USER));
+                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
 
         return findUser.getAccounts().stream()
                 .map(AccountDto::fromEntity)
