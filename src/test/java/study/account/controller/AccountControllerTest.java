@@ -13,12 +13,14 @@ import study.account.domain.CreateAccount;
 import study.account.dto.AccountDto;
 import study.account.service.AccountService;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static java.time.LocalDateTime.now;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -79,6 +81,49 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.accountNumber")
                         .value("1000000012"))
                 .andDo(print());
+    }
+
+    @Test
+    void successGetAccountsByUserId() throws Exception {
+        // given
+        List<AccountDto> accountDtos =
+                Arrays.asList(
+                        AccountDto.builder()
+                                .accountNumber("1111111111")
+                                .balance(1111L)
+                                .build(),
+                        AccountDto.builder()
+                                .accountNumber("2222222222")
+                                .balance(2222L)
+                                .build(),
+                        AccountDto.builder()
+                                .accountNumber("3333333333")
+                                .balance(3333L)
+                                .build()
+                );
+
+        given(accountService.getAccountList(anyLong()))
+                .willReturn(accountDtos);
+
+        // when
+        // then
+        mockMvc.perform(get("/account?userId=123"))
+                .andDo(print())
+                .andExpect(jsonPath("$[0].accountNumber")
+                        .value("1111111111"))
+                .andExpect(jsonPath("$[0].balance")
+                        .value(1111))
+
+                .andExpect(jsonPath("$[1].accountNumber")
+                        .value("2222222222"))
+                .andExpect(jsonPath("$[1].balance")
+                        .value(2222))
+
+                .andExpect(jsonPath("$[2].accountNumber")
+                        .value("3333333333"))
+                .andExpect(jsonPath("$[2].balance")
+                        .value(3333));
+
     }
 
 

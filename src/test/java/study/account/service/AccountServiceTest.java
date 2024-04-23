@@ -14,20 +14,21 @@ import study.account.dto.AccountDto;
 import study.account.exception.AccountException;
 import study.account.repository.AccountRepository;
 import study.account.repository.UserRepository;
-import study.account.type.ErrorCode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static java.time.LocalDateTime.*;
+import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static study.account.type.AccountStatus.*;
+import static study.account.type.AccountStatus.CLOSED;
+import static study.account.type.ErrorCode.*;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceTest {
@@ -130,7 +131,7 @@ class AccountServiceTest {
                 () -> accountService.createAccount(1L, 1000L));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NO_USER);
+        assertThat(exception.getErrorCode()).isEqualTo(NO_USER);
     }
 
     @Test
@@ -151,7 +152,7 @@ class AccountServiceTest {
 
         // then
         assertThat(exception.getErrorCode())
-                .isEqualTo(ErrorCode.EXCEED_ACCOUNT_COUNT);
+                .isEqualTo(EXCEED_ACCOUNT_COUNT);
     }
 
     @Test
@@ -167,11 +168,11 @@ class AccountServiceTest {
 
         given(accountRepository.findByAccountNumber(anyString()))
                 .willReturn(Optional.of(Account.builder()
-                                .id(2L)
-                                .user(user)
-                                .accountNumber("1000000012")
-                                .balance(0L)
-                                .registeredAt(now())
+                        .id(2L)
+                        .user(user)
+                        .accountNumber("1000000012")
+                        .balance(0L)
+                        .registeredAt(now())
                         .build()));
 
 
@@ -201,10 +202,11 @@ class AccountServiceTest {
 
         // when
         AccountException exception = assertThrows(AccountException.class,
-                () -> accountService.closeAccount(1L, "1000000000"));
+                () -> accountService
+                        .closeAccount(1L, "1000000000"));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NO_USER);
+        assertThat(exception.getErrorCode()).isEqualTo(NO_USER);
     }
 
     @Test
@@ -221,10 +223,11 @@ class AccountServiceTest {
 
         // when
         AccountException exception = assertThrows(AccountException.class,
-                () -> accountService.closeAccount(1L, "1000000000"));
+                () -> accountService
+                        .closeAccount(1L, "1000000000"));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NO_ACCOUNT);
+        assertThat(exception.getErrorCode()).isEqualTo(NO_ACCOUNT);
     }
 
     @Test
@@ -253,7 +256,7 @@ class AccountServiceTest {
 
         // then
         assertThat(exception.getErrorCode())
-                .isEqualTo(ErrorCode.NOT_MATCH_USER_AND_ACCOUNT);
+                .isEqualTo(NOT_MATCH_USER_AND_ACCOUNT);
     }
 
     @Test
@@ -281,10 +284,71 @@ class AccountServiceTest {
 
         // then
         assertThat(exception.getErrorCode())
-                .isEqualTo(ErrorCode.ACCOUNT_STILL_HAS_BALANCE);
+                .isEqualTo(ACCOUNT_STILL_HAS_BALANCE);
     }
 
+    @Test
+    @DisplayName("계좌 조회 성공")
+    void successGetAccountInfo() throws Exception {
+        // given
+        User userA = User.builder().id(1L).build();
 
+        List<Account> list = Arrays.asList(
+                Account.builder()
+                        .user(userA)
+                        .accountNumber("1111111111")
+                        .balance(1111L)
+                        .build(),
+                Account.builder()
+                        .user(userA)
+                        .accountNumber("2222222222")
+                        .balance(2222L)
+                        .build(),
+                Account.builder()
+                        .user(userA)
+                        .accountNumber("3333333333")
+                        .balance(3333L)
+                        .build()
+        );
+
+        userA = userA.builder().accounts(list).build();
+
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(userA));
+
+
+        // when
+        List<AccountDto> accountDtos = accountService.getAccountList(1L);
+
+
+        // then
+        assertThat(accountDtos.size()).isEqualTo(3);
+        assertThat(accountDtos.get(0).getAccountNumber())
+                .isEqualTo("1111111111");
+        assertThat(accountDtos.get(0).getBalance()).isEqualTo(1111L);
+        assertThat(accountDtos.get(1).getAccountNumber())
+                .isEqualTo("2222222222");
+        assertThat(accountDtos.get(1).getBalance()).isEqualTo(2222L);
+        assertThat(accountDtos.get(2).getAccountNumber())
+                .isEqualTo("3333333333");
+        assertThat(accountDtos.get(2).getBalance()).isEqualTo(3333L);
+    }
+
+    @Test
+    @DisplayName("계좌 조회 실패 - 해당 유저 없음")
+    void failGetAccountInfo_noUser() throws Exception {
+        // given
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.empty());
+
+        // when
+        AccountException exception = assertThrows(AccountException.class,
+                () -> accountService.getAccountList(1L));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(NO_USER);
+
+    }
 
 
 }

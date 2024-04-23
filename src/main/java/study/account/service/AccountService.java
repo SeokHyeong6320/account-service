@@ -1,7 +1,6 @@
 package study.account.service;
 
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Literal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.account.domain.Account;
@@ -109,10 +108,6 @@ public class AccountService {
     public List<AccountDto> getAccountList(Long userId) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new AccountException(NO_USER));
-
-        for (Account account : findUser.getAccounts()) {
-            System.out.println(account.getAccountNumber() + " " + account.getBalance());
-        }
 
         return findUser.getAccounts().stream()
                 .map(AccountDto::fromEntity)
