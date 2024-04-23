@@ -90,6 +90,45 @@ public class TransactionService {
     private String getUUID() {
         return UUID.randomUUID().toString().replace("-", "");
     }
+
+    public TransactionDto cancelTransaction
+            (String transactionId, String accountNumber, Long amount) {
+
+        Transaction findTransaction = transactionRepository
+                .findByTransactionId(transactionId)
+                .orElseThrow(() -> new AccountException(TRANSACTION_NOT_FOUND));
+
+
+        validateCancelTransaction(findTransaction, accountNumber, amount);
+
+        findTransaction.cancel();
+
+        return TransactionDto.fromEntity(findTransaction);
+
+    }
+
+    /**
+     * {
+     *   "accountNumber": "1000000000",
+     *   "resultType": "S",
+     *   "transactionId": "3ac06316af9b416496d9deb6258cd550",
+     *   "amount": 10,
+     *   "transactedAt": "2024-04-23T23:18:25.168873"
+     * }
+     */
+
+    private void validateCancelTransaction
+            (Transaction findTransaction, String accountNumber, Long amount) {
+
+        if (!Objects.equals(findTransaction.getAmount(), amount)) {
+            throw new AccountException(TRANSACTION_AMOUNT_NOT_MATCH);
+        }
+        if (!Objects.equals
+                (findTransaction.getAccount().getAccountNumber(), accountNumber)) {
+            throw new AccountException(TRANSACTION_AND_ACCOUNT_NOT_MATCH);
+        }
+
+    }
 }
 
 

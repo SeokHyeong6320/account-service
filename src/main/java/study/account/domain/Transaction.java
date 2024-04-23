@@ -37,12 +37,10 @@ public class Transaction {
     @Column(name = "balanceSnapshot")
     private Long balanceSnapshot;
 
-
-
     private LocalDateTime transactedAt;
 
     public void cancel() {
-        this.account.minusBalance(this.amount);
+        this.account.plusBalance(this.amount);
         this.transactionType = TransactionType.CANCEL;
     }
 }
