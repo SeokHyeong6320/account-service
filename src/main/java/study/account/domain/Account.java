@@ -38,6 +38,11 @@ public class Account extends BaseEntity{
         user.getAccounts().add(this);
     }
 
+    public void closeAccount() {
+        this.accountStatus = AccountStatus.CLOSED;
+        this.unRegisteredAt = LocalDateTime.now();
+    }
+
     public void plusBalance(long amount) {
         this.balance += amount;
     }

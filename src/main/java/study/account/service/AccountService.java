@@ -1,6 +1,5 @@
 package study.account.service;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,9 +10,11 @@ import study.account.exception.AccountException;
 import study.account.repository.AccountRepository;
 import study.account.repository.UserRepository;
 import study.account.type.AccountStatus;
-import study.account.type.ErrorCode;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
+
+import static study.account.type.ErrorCode.*;
 
 @Service
 @Transactional
@@ -25,9 +26,9 @@ public class AccountService {
 
     public AccountDto createAccount(Long userId, Long initialBalance) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountException(ErrorCode.NO_USER));
+                .orElseThrow(() -> new AccountException(NO_USER));
 
-        validationAccountCount(findUser);
+        validateAccountCount(findUser);
 
         Account account = Account.builder()
                 .user(findUser)
@@ -49,9 +50,65 @@ public class AccountService {
                 .orElse("1000000000");
     }
 
-    private void validationAccountCount(User findUser) {
+    private void validateAccountCount(User findUser) {
         if (findUser.getAccounts().size() >= 10) {
-            throw new AccountException(ErrorCode.EXCEED_ACCOUNT_COUNT);
+            throw new AccountException(EXCEED_ACCOUNT_COUNT);
         }
     }
+
+    public AccountDto closeAccount(Long userId, String accountNumber) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new AccountException(NO_USER));
+
+        Account findAccount = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new AccountException(NO_ACCOUNT));
+
+        validateCloseAccount(userId, findAccount);
+
+        findAccount.closeAccount();
+
+        accountRepository.save(findAccount);
+
+        return AccountDto.builder()
+                .userId(userId)
+                .accountNumber(accountNumber)
+                .unregisteredAt(findAccount.getUnRegisteredAt())
+                .build();
+    }
+
+    private void validateCloseAccount(Long userId, Account account) {
+        isMatchUserAndAccount(userId, account);
+
+        isAccountClose(account);
+
+        isAccountHasBalance(account);
+    }
+
+    private void isAccountHasBalance(Account account) {
+        if (account.getBalance() != 0) {
+            throw new AccountException(ACCOUNT_STILL_HAS_BALANCE);
+        }
+    }
+
+    private void isAccountClose(Account account) {
+        if (account.getAccountStatus() == AccountStatus.CLOSED) {
+            throw new AccountException(ACCOUNT_ALREADY_CLOSE);
+        }
+    }
+
+    private void isMatchUserAndAccount(Long userId, Account account) {
+        if (!Objects.equals(userId, account.getUser().getId())) {
+            throw new AccountException(NOT_MATCH_USER_AND_ACCOUNT);
+        }
+    }
+
+
 }
+
+
+
+
+
+
+
+

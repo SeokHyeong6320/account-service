@@ -26,6 +26,8 @@ public class AccountDto {
     @NotBlank
     private LocalDateTime registeredAt;
 
+    private LocalDateTime unregisteredAt;
+
     public static AccountDto fromEntity(Account account) {
         return AccountDto.builder()
                 .userId(account.getUser().getId())
