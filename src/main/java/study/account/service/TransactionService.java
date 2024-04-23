@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import study.account.domain.Account;
 import study.account.domain.Transaction;
 import study.account.domain.User;
+import study.account.dto.TransactionDto;
 import study.account.exception.AccountException;
 import study.account.repository.AccountRepository;
 import study.account.repository.TransactionRepository;
@@ -19,6 +20,8 @@ import java.util.UUID;
 
 import static study.account.type.AccountStatus.*;
 import static study.account.type.ErrorCode.*;
+import static study.account.type.TransactionResultType.*;
+import static study.account.type.TransactionType.*;
 
 @Service
 @Transactional
@@ -30,7 +33,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
 
 
-    public void createNewTransaction
+    public TransactionDto createNewTransaction
             (Long userId, String accountNumber, Long amount) {
 
         User findUser = userRepository.findById(userId)
@@ -43,17 +46,33 @@ public class TransactionService {
 
         findAccount.minusBalance(amount);
 
+        Transaction transaction = saveTransaction(amount, findAccount, USE, S);
+
+
+        return TransactionDto.fromEntity(transaction);
+    }
+
+    public void saveFailTransaction(String accountNumber, Long amount) {
+        Account findAccount = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new AccountException(NO_ACCOUNT));
+        saveTransaction(amount, findAccount, USE, F);
+    }
+
+    private Transaction saveTransaction
+            (Long amount, Account findAccount,
+             TransactionType transactionType, TransactionResultType resultType) {
         Transaction transaction = Transaction.builder()
                 .transactionId(getUUID())
                 .account(findAccount)
-                .transactionType(TransactionType.USE)
+                .transactionType(transactionType)
                 .amount(amount)
                 .balanceSnapshot(findAccount.getBalance())
-                .transactionResultType(TransactionResultType.S)
+                .transactionResultType(resultType)
                 .transactedAt(LocalDateTime.now())
                 .build();
 
         transactionRepository.save(transaction);
+        return transaction;
     }
 
     private void validateCreateTransaction(User findUser, Account findAccount, Long amount) {

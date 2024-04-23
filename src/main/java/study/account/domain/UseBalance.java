@@ -3,6 +3,7 @@ package study.account.domain;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.validator.constraints.UUID;
 import study.account.dto.TransactionDto;
@@ -27,6 +28,9 @@ public class UseBalance {
 
     }
 
+    @Getter
+    @AllArgsConstructor
+    @Builder
     public static class Response {
 
         @NotBlank
@@ -44,7 +48,13 @@ public class UseBalance {
 
         public static Response fromDto(TransactionDto transactionDto) {
 
-            return null;
+            return Response.builder()
+                    .accountNumber(transactionDto.getAccountNumber())
+                    .resultType(transactionDto.getResultType())
+                    .transactionId(transactionDto.getTransactionId())
+                    .amount(transactionDto.getAmount())
+                    .transactedAt(transactionDto.getTransactedAt())
+                    .build();
         }
 
     }
