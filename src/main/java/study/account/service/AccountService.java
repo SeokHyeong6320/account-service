@@ -7,6 +7,7 @@ import study.account.domain.Account;
 import study.account.domain.User;
 import study.account.dto.AccountDto;
 import study.account.exception.AccountException;
+import study.account.exception.UserException;
 import study.account.repository.AccountRepository;
 import study.account.repository.UserRepository;
 import study.account.type.AccountStatus;
@@ -28,7 +29,7 @@ public class AccountService {
 
     public AccountDto createAccount(Long userId, Long initialBalance) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         validateAccountCount(findUser);
 
@@ -60,7 +61,7 @@ public class AccountService {
 
     public AccountDto closeAccount(Long userId, String accountNumber) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         Account findAccount = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new AccountException(ACCOUNT_NOT_FOUND));
@@ -100,14 +101,14 @@ public class AccountService {
 
     private void isMatchUserAndAccount(User findUser, Account account) {
         if (!Objects.equals(findUser.getId(), account.getUser().getId())) {
-            throw new AccountException(USER_AND_ACCOUNT_NOT_MATCH);
+            throw new AccountException(ACCOUNT_AND_USER_NOT_MATCH);
         }
     }
 
     @Transactional(readOnly = true)
     public List<AccountDto> getAccountList(Long userId) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         return findUser.getAccounts().stream()
                 .map(AccountDto::fromEntity)

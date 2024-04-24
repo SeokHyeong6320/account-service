@@ -9,6 +9,7 @@ import study.account.domain.User;
 import study.account.dto.TransactionDto;
 import study.account.exception.AccountException;
 import study.account.exception.TransactionException;
+import study.account.exception.UserException;
 import study.account.repository.AccountRepository;
 import study.account.repository.TransactionRepository;
 import study.account.repository.UserRepository;
@@ -38,7 +39,7 @@ public class TransactionService {
             (Long userId, String accountNumber, Long amount) {
 
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         Account findAccount = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new AccountException(ACCOUNT_NOT_FOUND));
@@ -78,7 +79,7 @@ public class TransactionService {
 
     private void validateCreateTransaction(User findUser, Account findAccount, Long amount) {
         if (!Objects.equals(findUser.getId(), findAccount.getUser().getId())) {
-            throw new AccountException(USER_AND_ACCOUNT_NOT_MATCH);
+            throw new AccountException(ACCOUNT_AND_USER_NOT_MATCH);
         }
         if (findAccount.getAccountStatus() == CLOSED) {
             throw new AccountException(ACCOUNT_ALREADY_CLOSED);
@@ -114,7 +115,7 @@ public class TransactionService {
     public void saveFailCancelTransaction
             (String accountNumber, Long amount) {
         Account findAccount = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         saveTransaction(amount, findAccount, CANCEL, F);
     }

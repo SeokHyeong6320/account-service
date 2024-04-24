@@ -1,18 +1,16 @@
 package study.account.exception;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import study.account.type.ErrorCode;
 
 @Getter
-public class TransactionException extends ServiceException{
+public class UserException extends ServiceException{
 
     private ErrorCode errorCode;
     private String errorMessage;
 
-    public TransactionException(ErrorCode errorCode) {
+    public UserException(ErrorCode errorCode) {
         this.errorCode = errorCode;
         this.errorMessage = errorCode.getDescription();
     }
-
 }

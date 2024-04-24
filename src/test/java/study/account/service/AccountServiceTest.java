@@ -12,6 +12,7 @@ import study.account.domain.Account;
 import study.account.domain.User;
 import study.account.dto.AccountDto;
 import study.account.exception.AccountException;
+import study.account.exception.UserException;
 import study.account.repository.AccountRepository;
 import study.account.repository.UserRepository;
 
@@ -119,7 +120,7 @@ class AccountServiceTest {
     }
 
     @Test
-    @DisplayName("계좌 생성 실패 - 유저 없음")
+    @DisplayName("계좌 생성 실패 - 해당 유저 없음")
     void failCreateAccount_noUser() throws Exception {
         // given
 
@@ -127,7 +128,7 @@ class AccountServiceTest {
                 .willReturn(Optional.empty());
 
         // when
-        AccountException exception = assertThrows(AccountException.class,
+        UserException exception = assertThrows(UserException.class,
                 () -> accountService.createAccount(1L, 1000L));
 
         // then
@@ -194,14 +195,14 @@ class AccountServiceTest {
     }
 
     @Test
-    @DisplayName("계좌 해지 실패 - 유저 없음")
+    @DisplayName("계좌 해지 실패 - 해당 유저 없음")
     void failCloseAccount_noUser() throws Exception {
         // given
         given(userRepository.findById(anyLong()))
                 .willReturn(Optional.empty());
 
         // when
-        AccountException exception = assertThrows(AccountException.class,
+        UserException exception = assertThrows(UserException.class,
                 () -> accountService
                         .closeAccount(1L, "1000000000"));
 
@@ -256,7 +257,7 @@ class AccountServiceTest {
 
         // then
         assertThat(exception.getErrorCode())
-                .isEqualTo(USER_AND_ACCOUNT_NOT_MATCH);
+                .isEqualTo(ACCOUNT_AND_USER_NOT_MATCH);
     }
 
     @Test
@@ -342,7 +343,7 @@ class AccountServiceTest {
                 .willReturn(Optional.empty());
 
         // when
-        AccountException exception = assertThrows(AccountException.class,
+        UserException exception = assertThrows(UserException.class,
                 () -> accountService.getAccountList(1L));
 
         // then

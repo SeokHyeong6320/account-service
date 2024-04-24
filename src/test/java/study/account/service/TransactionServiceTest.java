@@ -14,6 +14,7 @@ import study.account.domain.User;
 import study.account.dto.TransactionDto;
 import study.account.exception.AccountException;
 import study.account.exception.TransactionException;
+import study.account.exception.UserException;
 import study.account.repository.AccountRepository;
 import study.account.repository.TransactionRepository;
 import study.account.repository.UserRepository;
@@ -112,7 +113,7 @@ class TransactionServiceTest {
                 .willReturn(Optional.empty());
 
         // when
-        AccountException exception = assertThrows(AccountException.class,
+        UserException exception = assertThrows(UserException.class,
                 () -> transactionService.createNewTransaction
                         (1L, "1000000000", 1000L));
 
@@ -159,7 +160,7 @@ class TransactionServiceTest {
 
         // then
         assertThat(exception.getErrorCode())
-                .isEqualTo(USER_AND_ACCOUNT_NOT_MATCH);
+                .isEqualTo(ACCOUNT_AND_USER_NOT_MATCH);
     }
 
     @Test

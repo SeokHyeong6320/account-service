@@ -9,7 +9,9 @@ public enum ErrorCode {
 
     USER_NOT_FOUND("해당 id의 사용자가 없습니다"),
 
-    USER_AND_ACCOUNT_NOT_MATCH("해당 유저의 계좌가 아닙니다"),
+
+
+    ACCOUNT_AND_USER_NOT_MATCH("해당 유저의 계좌가 아닙니다"),
     ACCOUNT_NOT_FOUND("해당 계좌번호에 해당하는 계좌가 없습니다"),
     ACCOUNT_COUNT_EXCEED("계좌의 갯수는 10개를 초과할 수 없습니다"),
 
