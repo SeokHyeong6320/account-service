@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import study.account.domain.CancelTransaction;
 import study.account.domain.TransactionInfo;
 import study.account.domain.UseBalance;
+import study.account.dto.TransactionDto;
 import study.account.exception.AccountException;
 import study.account.service.TransactionService;
 
@@ -54,7 +55,23 @@ public class TransactionController {
     }
 
     @GetMapping
-    public TransactionInfo getTransactionInfo() {
-        return null;
+    public TransactionInfo getTransactionInfo
+            (@RequestParam("transaction-id") String transactionId) {
+
+        TransactionDto transactionDto =
+                transactionService.findTransaction(transactionId);
+
+        return TransactionInfo.builder()
+                .accountNumber(transactionDto.getAccountNumber())
+                .transactionType(transactionDto.getTransactionType())
+                .resultType(transactionDto.getResultType())
+                .transactionId(transactionDto.getTransactionId())
+                .amount(transactionDto.getAmount())
+                .transactedAt(transactionDto.getTransactedAt())
+                .build();
     }
 }
+
+
+
+

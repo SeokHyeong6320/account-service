@@ -118,16 +118,6 @@ public class TransactionService {
         saveTransaction(amount, findAccount, CANCEL, F);
     }
 
-    /**
-     * {
-     *   "accountNumber": "1000000000",
-     *   "resultType": "S",
-     *   "transactionId": "3ac06316af9b416496d9deb6258cd550",
-     *   "amount": 10,
-     *   "transactedAt": "2024-04-23T23:18:25.168873"
-     * }
-     */
-
     private void validateCancelTransaction
             (Transaction findTransaction, String accountNumber, Long amount) {
 
@@ -138,6 +128,18 @@ public class TransactionService {
                 (findTransaction.getAccount().getAccountNumber(), accountNumber)) {
             throw new AccountException(TRANSACTION_AND_ACCOUNT_NOT_MATCH);
         }
+
+    }
+
+    @Transactional(readOnly = true)
+    public TransactionDto findTransaction(String transactionId) {
+
+        return TransactionDto.fromEntity(
+                transactionRepository
+                        .findByTransactionId(transactionId)
+                        .orElseThrow(() ->
+                                new AccountException(TRANSACTION_NOT_FOUND))
+        );
 
     }
 }

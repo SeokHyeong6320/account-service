@@ -29,7 +29,7 @@ Content-Type: application/json
 {
   "userId": 1,
   "accountNumber": "1000000000",
-  "amount": 10
+  "amount": 1500
 }
 
 
@@ -42,5 +42,8 @@ Content-Type: application/json
   "accountNumber": "1000000000",
   "amount": 10
 }
+
+### 거래 확인
+GET http://localhost:8080/transaction?transaction-id=50a20f396c864764af68e69bfb24a61a
 
 

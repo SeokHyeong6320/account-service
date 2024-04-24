@@ -34,7 +34,7 @@ public class AccountController {
     }
 
     @GetMapping
-    public List<AccountInfo> getAccountsByUserId(@RequestParam Long userId) {
+    public List<AccountInfo> getAccountsByUserId(@RequestParam("user-id") Long userId) {
 
         return accountService.getAccountList(userId).stream()
                 .map(accountDto -> AccountInfo.builder()
