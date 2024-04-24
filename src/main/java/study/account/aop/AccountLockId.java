@@ -1,6 +1,6 @@
 package study.account.aop;
 
-public interface AccountLockIdInterface {
+public interface AccountLockId {
 
     String getAccountNumber();
 }

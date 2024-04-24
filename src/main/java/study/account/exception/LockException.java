@@ -4,14 +4,13 @@ import lombok.Getter;
 import study.account.type.ErrorCode;
 
 @Getter
-public class AccountException extends ServiceException{
+public class LockException extends ServiceException{
 
     private ErrorCode errorCode;
     private String errorMessage;
 
-    public AccountException(ErrorCode errorCode) {
+    public LockException(ErrorCode errorCode) {
         this.errorCode = errorCode;
         this.errorMessage = errorCode.getDescription();
     }
-
 }

@@ -21,7 +21,9 @@ public enum ErrorCode {
     TRANSACTION_AMOUNT_EXCEED_BALANCE("해당 계좌의 잔액이 부족합니다"),
     TRANSACTION_AMOUNT_GET_OUT_RANGE("거래금액이 범위를 벗어났습니다"),
     TRANSACTION_AMOUNT_NOT_MATCH("거래금액과 취소금액이 일치하지 않습니다"),
-    TRANSACTION_AND_ACCOUNT_NOT_MATCH("해당 계좌의 거래가 아닙니다");
+    TRANSACTION_AND_ACCOUNT_NOT_MATCH("해당 계좌의 거래가 아닙니다"),
+
+    ACCOUNT_TRANSACTION_LOCK("해당 계좌는 현재 사용중입니다");
 
     private final String description;
 }

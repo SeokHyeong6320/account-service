@@ -3,6 +3,7 @@ package study.account.domain;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import study.account.aop.AccountLockId;
 import study.account.dto.TransactionDto;
 import study.account.type.TransactionResultType;
 
@@ -12,7 +13,7 @@ public class CancelTransaction {
 
     @Getter
     @AllArgsConstructor
-    public static class Request {
+    public static class Request implements AccountLockId {
         private String transactionId;
         private String accountNumber;
         private Long amount;

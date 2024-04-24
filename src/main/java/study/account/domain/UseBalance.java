@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import study.account.aop.AccountLockId;
 import study.account.dto.TransactionDto;
 import study.account.type.TransactionResultType;
 
@@ -14,7 +15,7 @@ public class UseBalance {
 
     @Getter
     @AllArgsConstructor
-    public static class Request {
+    public static class Request implements AccountLockId {
 
         @NotBlank
         private Long userId;

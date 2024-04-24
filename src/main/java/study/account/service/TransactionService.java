@@ -3,6 +3,7 @@ package study.account.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import study.account.aop.AccountLock;
 import study.account.domain.Account;
 import study.account.domain.Transaction;
 import study.account.domain.User;
@@ -37,6 +38,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
 
 
+    @AccountLock
     public TransactionDto createNewTransaction
             (Long userId, String accountNumber, Long amount) {
 
@@ -95,6 +97,7 @@ public class TransactionService {
         return UUID.randomUUID().toString().replace("-", "");
     }
 
+    @AccountLock
     public TransactionDto cancelTransaction
             (String transactionId, String accountNumber, Long amount) {
 
