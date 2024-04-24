@@ -20,10 +20,12 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-import static study.account.type.AccountStatus.*;
+import static study.account.type.AccountStatus.CLOSED;
 import static study.account.type.ErrorCode.*;
-import static study.account.type.TransactionResultType.*;
-import static study.account.type.TransactionType.*;
+import static study.account.type.TransactionResultType.F;
+import static study.account.type.TransactionResultType.S;
+import static study.account.type.TransactionType.CANCEL;
+import static study.account.type.TransactionType.USE;
 
 @Service
 @Transactional

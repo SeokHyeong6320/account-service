@@ -7,7 +7,7 @@ import study.account.type.AccountStatus;
 
 import java.time.LocalDateTime;
 
-import static study.account.type.ErrorCode.*;
+import static study.account.type.ErrorCode.TRANSACTION_AMOUNT_EXCEED_BALANCE;
 
 @Entity
 @Getter

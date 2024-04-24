@@ -8,13 +8,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import study.account.domain.Account;
 import study.account.domain.CancelTransaction;
-import study.account.domain.Transaction;
 import study.account.domain.UseBalance;
 import study.account.dto.TransactionDto;
 import study.account.service.TransactionService;
-import study.account.type.TransactionType;
 
 import java.time.LocalDateTime;
 
@@ -26,7 +23,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static study.account.type.TransactionResultType.S;
-import static study.account.type.TransactionType.*;
+import static study.account.type.TransactionType.CANCEL;
+import static study.account.type.TransactionType.USE;
 
 @WebMvcTest(TransactionController.class)
 @MockBean(JpaMetamodelMappingContext.class)

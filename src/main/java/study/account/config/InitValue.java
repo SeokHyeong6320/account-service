@@ -4,9 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import study.account.domain.Transaction;
 import study.account.domain.User;
-import study.account.repository.TransactionRepository;
 import study.account.repository.UserRepository;
 
 @Component
