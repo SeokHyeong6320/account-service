@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import study.account.domain.Account;
 import study.account.domain.Transaction;
+import study.account.domain.TransactionInfo;
 import study.account.domain.User;
 import study.account.dto.TransactionDto;
 import study.account.exception.AccountException;
@@ -435,6 +436,70 @@ class TransactionServiceTest {
         // then
         assertThat(exception.getErrorCode())
                 .isEqualTo(TRANSACTION_AND_ACCOUNT_NOT_MATCH);
+    }
+
+    @Test
+    @DisplayName("거래 조회 성공")
+    void successFindTransaction() throws Exception {
+        // given
+        Account account = Account.builder()
+                .accountNumber("100000000")
+                .build();
+
+        Transaction transaction = Transaction.builder()
+                .id(3L)
+                .transactionId("findTransactionId")
+                .transactionType(USE)
+                .transactionResultType(S)
+                .amount(1000L)
+                .account(account)
+                .transactedAt(LocalDateTime.parse("2024-04-23T21:19:33"))
+                .balanceSnapshot(9500L)
+                .build();
+        given(transactionRepository.findByTransactionId(anyString()))
+                .willReturn(Optional.of(transaction));
+
+        // when
+        TransactionDto transactionDto = transactionService.findTransaction("transactionId");
+        TransactionInfo transactionInfo = TransactionInfo.builder()
+                .accountNumber(transactionDto.getAccountNumber())
+                .transactionType(transactionDto.getTransactionType())
+                .resultType(transactionDto.getResultType())
+                .transactionId(transactionDto.getTransactionId())
+                .amount(transaction.getAmount())
+                .transactedAt(transactionDto.getTransactedAt())
+                .build();
+
+
+        // then
+        assertThat(transactionInfo.getAccountNumber())
+                .isEqualTo("100000000");
+        assertThat(transactionInfo.getTransactionType())
+                .isEqualTo(USE);
+        assertThat(transactionInfo.getResultType())
+                .isEqualTo(S);
+        assertThat(transactionInfo.getTransactionId())
+                .isEqualTo("findTransactionId");
+        assertThat(transactionInfo.getAmount())
+                .isEqualTo(1000L);
+        assertThat(transactionInfo.getTransactedAt())
+                .isEqualTo("2024-04-23T21:19:33");
+    }
+
+    @Test
+    @DisplayName("거래 조회 실패 - 해당 거래 없음")
+    void failFindTransaction_transactionNotFound() throws Exception {
+        // given
+        given(transactionRepository.findByTransactionId(anyString()))
+                .willReturn(Optional.empty());
+
+        // when
+        AccountException exception = assertThrows(AccountException.class,
+                () -> transactionService
+                        .findTransaction("transactionId"));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(TRANSACTION_NOT_FOUND);
     }
 
 
