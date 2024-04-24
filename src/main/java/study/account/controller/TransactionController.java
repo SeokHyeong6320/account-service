@@ -1,7 +1,6 @@
 package study.account.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import study.account.domain.CancelTransaction;
 import study.account.domain.TransactionInfo;
@@ -28,7 +27,7 @@ public class TransactionController {
                                     request.getAmount()));
 
         } catch (AccountException e) {
-            transactionService.saveFailTransaction
+            transactionService.saveFailNewTransaction
                     (request.getAccountNumber(), request.getAmount());
             throw e;
         }
@@ -38,11 +37,20 @@ public class TransactionController {
     public CancelTransaction.Response cancelTransaction
             (@RequestBody CancelTransaction.Request request) {
 
-        return CancelTransaction.Response
-                .fromDto(transactionService.cancelTransaction
-                        (request.getTransactionId(),
-                                request.getAccountNumber(),
-                                request.getAmount()));
+        try {
+            return CancelTransaction.Response
+                    .fromDto(transactionService.cancelTransaction
+                            (request.getTransactionId(),
+                                    request.getAccountNumber(),
+                                    request.getAmount()));
+        } catch (AccountException e) {
+            transactionService
+                    .saveFailCancelTransaction(
+                            request.getAccountNumber(),
+                            request.getAmount()
+                    );
+            throw e;
+        }
     }
 
     @GetMapping

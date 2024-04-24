@@ -41,6 +41,5 @@ public class Transaction {
 
     public void cancel() {
         this.account.plusBalance(this.amount);
-        this.transactionType = TransactionType.CANCEL;
     }
 }

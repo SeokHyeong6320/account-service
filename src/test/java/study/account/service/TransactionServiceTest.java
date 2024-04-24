@@ -29,6 +29,7 @@ import static study.account.type.AccountStatus.CLOSED;
 import static study.account.type.AccountStatus.IN_USE;
 import static study.account.type.ErrorCode.*;
 import static study.account.type.TransactionResultType.S;
+import static study.account.type.TransactionType.CANCEL;
 import static study.account.type.TransactionType.USE;
 
 @ExtendWith(MockitoExtension.class)
@@ -267,6 +268,180 @@ class TransactionServiceTest {
         assertThat(exception.getErrorCode())
                 .isEqualTo(TRANSACTION_AMOUNT_GET_OUT_RANGE);
     }
+
+    @Test
+    @DisplayName("거래 취소 성공")
+    void successCancelTransaction() throws Exception {
+        // given
+        User user = User.builder().id(1L).build();
+
+        Account account = Account.builder()
+                .id(2L)
+                .user(user)
+                .accountNumber("1000000011")
+                .balance(9500L)
+                .accountStatus(IN_USE)
+                .build();
+
+        Transaction transaction = Transaction.builder()
+                .id(3L)
+                .transactionId("transactionId")
+                .transactionResultType(S)
+                .amount(1000L)
+                .account(account)
+                .transactedAt(LocalDateTime.now())
+                .balanceSnapshot(9500L)
+                .build();
+
+        given(transactionRepository.findByTransactionId(anyString()))
+                .willReturn(Optional.of(transaction));
+
+        given(accountRepository.findByAccountNumber(anyString()))
+                .willReturn(Optional.of(account));
+
+
+        // when
+        ArgumentCaptor<Transaction> captor =
+                ArgumentCaptor.forClass(Transaction.class);
+
+        TransactionDto transactionDto =
+                transactionService.cancelTransaction
+                        ("transactionId",
+                                "1000000011", 1000L);
+
+        // then
+        verify(transactionRepository, times(1))
+                .save(captor.capture());
+
+        assertThat(captor.getValue().getAmount()).isEqualTo(1000L);
+        assertThat(captor.getValue().getBalanceSnapshot())
+                .isEqualTo(10500L);
+        assertThat(captor.getValue().getTransactionType()).isEqualTo(CANCEL);
+        assertThat(captor.getValue().getTransactionResultType()).isEqualTo(S);
+        assertThat(captor.getValue().getAccount()).isEqualTo(account);
+
+        assertThat(transactionDto.getAccountNumber())
+                .isEqualTo("1000000011");
+        assertThat(transactionDto.getTransactionType()).isEqualTo(CANCEL);
+        assertThat(transactionDto.getResultType()).isEqualTo(S);
+        assertThat(transactionDto.getAmount()).isEqualTo(1000L);
+    }
+
+    @Test
+    @DisplayName("거래 취소 실패 - 해당 거래 없음")
+    void failCancelTransaction_userNotAccount() throws Exception {
+        // given
+        given(transactionRepository.findByTransactionId(anyString()))
+                .willReturn(Optional.empty());
+
+        // when
+        AccountException exception = assertThrows(AccountException.class,
+                () -> transactionService
+                        .cancelTransaction("transactionId",
+                                "100000000", 1000L));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(TRANSACTION_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("거래 취소 실패 - 해당 계좌 없음")
+    void failCancelTransaction_accountNotAccount() throws Exception {
+        // given
+        Transaction transaction = Transaction.builder().id(2L).build();
+
+        given(transactionRepository.findByTransactionId(anyString()))
+                .willReturn(Optional.of(transaction));
+
+        given(accountRepository.findByAccountNumber(anyString()))
+                .willReturn(Optional.empty());
+
+        // when
+        AccountException exception = assertThrows(AccountException.class,
+                () -> transactionService
+                        .cancelTransaction("transactionId",
+                                "100000000", 1000L));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(ACCOUNT_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("거래 취소 실패 - 거래 금액 불일치")
+    void failCancelTransaction_amountNotMatch() throws Exception {
+        // given
+        Account account = Account.builder()
+                .id(2L)
+                .accountNumber("1000000011")
+                .balance(9500L)
+                .accountStatus(IN_USE)
+                .build();
+
+        Transaction transaction = Transaction.builder()
+                .id(3L)
+                .transactionId("transactionId")
+                .amount(1000L)
+                .account(account)
+                .build();
+
+        given(transactionRepository.findByTransactionId(anyString()))
+                .willReturn(Optional.of(transaction));
+
+        given(accountRepository.findByAccountNumber(anyString()))
+                .willReturn(Optional.of(account));
+
+
+        // when
+        AccountException exception = assertThrows(AccountException.class,
+                () -> transactionService
+                        .cancelTransaction("transactionId",
+                                "100000000", 1500L));
+
+
+        // then
+        assertThat(exception.getErrorCode())
+                .isEqualTo(TRANSACTION_AMOUNT_NOT_MATCH);
+    }
+
+    @Test
+    @DisplayName("거래 취소 실패 - 계좌 불일치")
+    void failCancelTransaction_transactionAndAccountNotMatch() throws Exception {
+        // given
+        Account account = Account.builder()
+                .id(2L)
+                .accountNumber("1000000011")
+                .build();
+
+        Transaction transaction = Transaction.builder()
+                .id(3L)
+                .amount(1000L)
+                .account(account)
+                .build();
+
+        given(transactionRepository.findByTransactionId(anyString()))
+                .willReturn(Optional.of(transaction));
+
+        given(accountRepository.findByAccountNumber(anyString()))
+                .willReturn(Optional.of(account));
+
+
+        // when
+        AccountException exception = assertThrows(AccountException.class,
+                () -> transactionService
+                        .cancelTransaction("transactionId",
+                                "100000000", 1000L));
+
+
+        // then
+        assertThat(exception.getErrorCode())
+                .isEqualTo(TRANSACTION_AND_ACCOUNT_NOT_MATCH);
+    }
+
+
+
+
+
+
 
 
 

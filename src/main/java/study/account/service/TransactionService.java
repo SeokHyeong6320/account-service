@@ -52,7 +52,7 @@ public class TransactionService {
         return TransactionDto.fromEntity(transaction);
     }
 
-    public void saveFailTransaction(String accountNumber, Long amount) {
+    public void saveFailNewTransaction(String accountNumber, Long amount) {
         Account findAccount = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new AccountException(ACCOUNT_NOT_FOUND));
         saveTransaction(amount, findAccount, USE, F);
@@ -98,13 +98,24 @@ public class TransactionService {
                 .findByTransactionId(transactionId)
                 .orElseThrow(() -> new AccountException(TRANSACTION_NOT_FOUND));
 
+        Account findAccount = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new AccountException(ACCOUNT_NOT_FOUND));
+
 
         validateCancelTransaction(findTransaction, accountNumber, amount);
 
         findTransaction.cancel();
 
-        return TransactionDto.fromEntity(findTransaction);
+        return TransactionDto
+                .fromEntity(saveTransaction(amount, findAccount, CANCEL, S));
+    }
 
+    public void saveFailCancelTransaction
+            (String accountNumber, Long amount) {
+        Account findAccount = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+
+        saveTransaction(amount, findAccount, CANCEL, F);
     }
 
     /**
