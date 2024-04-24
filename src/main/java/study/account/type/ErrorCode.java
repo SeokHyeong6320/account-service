@@ -16,6 +16,8 @@ public enum ErrorCode {
     ACCOUNT_ALREADY_CLOSED("해당 계좌는 이미 해지된 계좌입니다"),
     ACCOUNT_BALANCE_STILL_EXIST("해당 계좌의 잔액이 존재합니다"),
 
+
+
     TRANSACTION_NOT_FOUND("해당 거래가 존재하지 않습니다"),
     TRANSACTION_AMOUNT_EXCEED_BALANCE("해당 계좌의 잔액이 부족합니다"),
     TRANSACTION_AMOUNT_GET_OUT_RANGE("거래금액이 범위를 벗어났습니다"),

@@ -6,12 +6,12 @@ import study.account.type.ErrorCode;
 
 @Slf4j
 @Getter
-public class AccountException extends ServiceException{
+public class TransactionException extends ServiceException{
 
     private ErrorCode errorCode;
     private String errorMessage;
 
-    public AccountException(ErrorCode errorCode) {
+    public TransactionException(ErrorCode errorCode) {
         this.errorCode = errorCode;
         this.errorMessage = errorCode.getDescription();
     }

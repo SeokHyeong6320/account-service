@@ -7,6 +7,8 @@ import study.account.domain.TransactionInfo;
 import study.account.domain.UseBalance;
 import study.account.dto.TransactionDto;
 import study.account.exception.AccountException;
+import study.account.exception.ServiceException;
+import study.account.exception.TransactionException;
 import study.account.service.TransactionService;
 
 @RestController
@@ -27,7 +29,7 @@ public class TransactionController {
                                     request.getAccountNumber(),
                                     request.getAmount()));
 
-        } catch (AccountException e) {
+        } catch (ServiceException e) {
             transactionService.saveFailNewTransaction
                     (request.getAccountNumber(), request.getAmount());
             throw e;
@@ -44,7 +46,7 @@ public class TransactionController {
                             (request.getTransactionId(),
                                     request.getAccountNumber(),
                                     request.getAmount()));
-        } catch (AccountException e) {
+        } catch (ServiceException e) {
             transactionService
                     .saveFailCancelTransaction(
                             request.getAccountNumber(),

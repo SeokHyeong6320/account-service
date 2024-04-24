@@ -13,6 +13,7 @@ import study.account.domain.TransactionInfo;
 import study.account.domain.User;
 import study.account.dto.TransactionDto;
 import study.account.exception.AccountException;
+import study.account.exception.TransactionException;
 import study.account.repository.AccountRepository;
 import study.account.repository.TransactionRepository;
 import study.account.repository.UserRepository;
@@ -233,7 +234,7 @@ class TransactionServiceTest {
 
 
         // when
-        AccountException exception = assertThrows(AccountException.class,
+        TransactionException exception = assertThrows(TransactionException.class,
                 () -> transactionService.createNewTransaction
                         (1L, "1000000000", -1L));
 
@@ -261,7 +262,7 @@ class TransactionServiceTest {
 
 
         // when
-        AccountException exception = assertThrows(AccountException.class,
+        TransactionException exception = assertThrows(TransactionException.class,
                 () -> transactionService.createNewTransaction
                         (1L, "1000000000", 1000000001L));
 
@@ -336,7 +337,7 @@ class TransactionServiceTest {
                 .willReturn(Optional.empty());
 
         // when
-        AccountException exception = assertThrows(AccountException.class,
+        TransactionException exception = assertThrows(TransactionException.class,
                 () -> transactionService
                         .cancelTransaction("transactionId",
                                 "100000000", 1000L));
@@ -393,7 +394,7 @@ class TransactionServiceTest {
 
 
         // when
-        AccountException exception = assertThrows(AccountException.class,
+        TransactionException exception = assertThrows(TransactionException.class,
                 () -> transactionService
                         .cancelTransaction("transactionId",
                                 "100000000", 1500L));
@@ -427,7 +428,7 @@ class TransactionServiceTest {
 
 
         // when
-        AccountException exception = assertThrows(AccountException.class,
+        TransactionException exception = assertThrows(TransactionException.class,
                 () -> transactionService
                         .cancelTransaction("transactionId",
                                 "100000000", 1000L));
@@ -494,7 +495,7 @@ class TransactionServiceTest {
                 .willReturn(Optional.empty());
 
         // when
-        AccountException exception = assertThrows(AccountException.class,
+        TransactionException exception = assertThrows(TransactionException.class,
                 () -> transactionService
                         .findTransaction("transactionId"));
 

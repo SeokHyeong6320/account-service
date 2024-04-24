@@ -8,6 +8,7 @@ import study.account.domain.Transaction;
 import study.account.domain.User;
 import study.account.dto.TransactionDto;
 import study.account.exception.AccountException;
+import study.account.exception.TransactionException;
 import study.account.repository.AccountRepository;
 import study.account.repository.TransactionRepository;
 import study.account.repository.UserRepository;
@@ -83,7 +84,7 @@ public class TransactionService {
             throw new AccountException(ACCOUNT_ALREADY_CLOSED);
         }
         if (amount <= 0 || amount > 1000000000) {
-            throw new AccountException(TRANSACTION_AMOUNT_GET_OUT_RANGE);
+            throw new TransactionException(TRANSACTION_AMOUNT_GET_OUT_RANGE);
         }
     }
 
@@ -96,7 +97,7 @@ public class TransactionService {
 
         Transaction findTransaction = transactionRepository
                 .findByTransactionId(transactionId)
-                .orElseThrow(() -> new AccountException(TRANSACTION_NOT_FOUND));
+                .orElseThrow(() -> new TransactionException(TRANSACTION_NOT_FOUND));
 
         Account findAccount = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new AccountException(ACCOUNT_NOT_FOUND));
@@ -122,11 +123,12 @@ public class TransactionService {
             (Transaction findTransaction, String accountNumber, Long amount) {
 
         if (!Objects.equals(findTransaction.getAmount(), amount)) {
-            throw new AccountException(TRANSACTION_AMOUNT_NOT_MATCH);
+            throw new TransactionException(TRANSACTION_AMOUNT_NOT_MATCH);
         }
         if (!Objects.equals
                 (findTransaction.getAccount().getAccountNumber(), accountNumber)) {
-            throw new AccountException(TRANSACTION_AND_ACCOUNT_NOT_MATCH);
+            throw new TransactionException(TRANSACTION_AND_ACCOUNT_NOT_MATCH) {
+            };
         }
 
     }
@@ -138,7 +140,7 @@ public class TransactionService {
                 transactionRepository
                         .findByTransactionId(transactionId)
                         .orElseThrow(() ->
-                                new AccountException(TRANSACTION_NOT_FOUND))
+                                new TransactionException(TRANSACTION_NOT_FOUND))
         );
 
     }
