@@ -46,19 +46,6 @@ public class AccountService {
         return AccountDto.fromEntity(account);
     }
 
-    private String getNewAccountNumber() {
-        return accountRepository.findFirstByOrderByIdDesc()
-                .map(account ->
-                        (Integer.parseInt(account.getAccountNumber())) + 1 + "")
-                .orElse("1000000000");
-    }
-
-    private void validateAccountCount(User findUser) {
-        if (findUser.getAccounts().size() >= 10) {
-            throw new AccountException(ACCOUNT_COUNT_EXCEED);
-        }
-    }
-
     public AccountDto closeAccount(Long userId, String accountNumber) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
@@ -79,32 +66,6 @@ public class AccountService {
                 .build();
     }
 
-    private void validateCloseAccount(User findUser, Account account) {
-        isMatchUserAndAccount(findUser, account);
-
-        isAccountClose(account);
-
-        isAccountHasBalance(account);
-    }
-
-    private void isAccountHasBalance(Account account) {
-        if (account.getBalance() != 0) {
-            throw new AccountException(ACCOUNT_BALANCE_STILL_EXIST);
-        }
-    }
-
-    private void isAccountClose(Account account) {
-        if (account.getAccountStatus() == AccountStatus.CLOSED) {
-            throw new AccountException(ACCOUNT_ALREADY_CLOSED);
-        }
-    }
-
-    private void isMatchUserAndAccount(User findUser, Account account) {
-        if (!Objects.equals(findUser.getId(), account.getUser().getId())) {
-            throw new AccountException(ACCOUNT_AND_USER_NOT_MATCH);
-        }
-    }
-
     @Transactional(readOnly = true)
     public List<AccountDto> getAccountList(Long userId) {
         User findUser = userRepository.findById(userId)
@@ -115,6 +76,32 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
+    private String getNewAccountNumber() {
+        return accountRepository.findFirstByOrderByIdDesc()
+                .map(account ->
+                        (Integer.parseInt(account.getAccountNumber())) + 1 + "")
+                .orElse("1000000000");
+    }
+
+    private void validateAccountCount(User findUser) {
+        if (findUser.getAccounts().size() >= 10) {
+            throw new AccountException(ACCOUNT_COUNT_EXCEED);
+        }
+    }
+
+    private void validateCloseAccount(User findUser, Account account) {
+        if (!Objects.equals(findUser.getId(), account.getUser().getId())) {
+            throw new AccountException(ACCOUNT_AND_USER_NOT_MATCH);
+        }
+
+        if (account.getAccountStatus() == AccountStatus.CLOSED) {
+            throw new AccountException(ACCOUNT_ALREADY_CLOSED);
+        }
+
+        if (account.getBalance() != 0) {
+            throw new AccountException(ACCOUNT_BALANCE_STILL_EXIST);
+        }
+    }
 
 }
 

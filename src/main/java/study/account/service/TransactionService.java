@@ -64,39 +64,6 @@ public class TransactionService {
         saveTransaction(amount, findAccount, USE, F);
     }
 
-    private Transaction saveTransaction
-            (Long amount, Account findAccount,
-             TransactionType transactionType, TransactionResultType resultType) {
-        Transaction transaction = Transaction.builder()
-                .transactionId(getUUID())
-                .account(findAccount)
-                .transactionType(transactionType)
-                .amount(amount)
-                .balanceSnapshot(findAccount.getBalance())
-                .transactionResultType(resultType)
-                .transactedAt(LocalDateTime.now())
-                .build();
-
-        transactionRepository.save(transaction);
-        return transaction;
-    }
-
-    private void validateCreateTransaction(User findUser, Account findAccount, Long amount) {
-        if (!Objects.equals(findUser.getId(), findAccount.getUser().getId())) {
-            throw new AccountException(ACCOUNT_AND_USER_NOT_MATCH);
-        }
-        if (findAccount.getAccountStatus() == CLOSED) {
-            throw new AccountException(ACCOUNT_ALREADY_CLOSED);
-        }
-        if (amount <= 0 || amount > 1000000000) {
-            throw new TransactionException(TRANSACTION_AMOUNT_GET_OUT_RANGE);
-        }
-    }
-
-    private String getUUID() {
-        return UUID.randomUUID().toString().replace("-", "");
-    }
-
     @AccountLock
     public TransactionDto cancelTransaction
             (String transactionId, String accountNumber, Long amount) {
@@ -117,6 +84,53 @@ public class TransactionService {
                 .fromEntity(saveTransaction(amount, findAccount, CANCEL, S));
     }
 
+    @Transactional(readOnly = true)
+    public TransactionDto findTransaction(String transactionId) {
+
+        return TransactionDto.fromEntity(
+                transactionRepository
+                        .findByTransactionId(transactionId)
+                        .orElseThrow(() ->
+                                new TransactionException(TRANSACTION_NOT_FOUND))
+        );
+
+    }
+
+    private Transaction saveTransaction
+            (Long amount, Account findAccount,
+             TransactionType transactionType, TransactionResultType resultType) {
+        Transaction transaction = Transaction.builder()
+                .transactionId(getUUID())
+                .account(findAccount)
+                .transactionType(transactionType)
+                .amount(amount)
+                .balanceSnapshot(findAccount.getBalance())
+                .transactionResultType(resultType)
+                .transactedAt(LocalDateTime.now())
+                .build();
+
+        transactionRepository.save(transaction);
+        return transaction;
+    }
+
+    private String getUUID() {
+        return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    private void validateCreateTransaction(User findUser, Account findAccount, Long amount) {
+        if (!Objects.equals(findUser.getId(), findAccount.getUser().getId())) {
+            throw new AccountException(ACCOUNT_AND_USER_NOT_MATCH);
+        }
+
+        if (findAccount.getAccountStatus() == CLOSED) {
+            throw new AccountException(ACCOUNT_ALREADY_CLOSED);
+        }
+
+        if (amount <= 0 || amount > 1000000000) {
+            throw new TransactionException(TRANSACTION_AMOUNT_GET_OUT_RANGE);
+        }
+    }
+
     public void saveFailCancelTransaction
             (String accountNumber, Long amount) {
         Account findAccount = accountRepository.findByAccountNumber(accountNumber)
@@ -131,6 +145,7 @@ public class TransactionService {
         if (!Objects.equals(findTransaction.getAmount(), amount)) {
             throw new TransactionException(TRANSACTION_AMOUNT_NOT_MATCH);
         }
+
         if (!Objects.equals
                 (findTransaction.getAccount().getAccountNumber(), accountNumber)) {
             throw new TransactionException(TRANSACTION_AND_ACCOUNT_NOT_MATCH) {
@@ -139,17 +154,6 @@ public class TransactionService {
 
     }
 
-    @Transactional(readOnly = true)
-    public TransactionDto findTransaction(String transactionId) {
-
-        return TransactionDto.fromEntity(
-                transactionRepository
-                        .findByTransactionId(transactionId)
-                        .orElseThrow(() ->
-                                new TransactionException(TRANSACTION_NOT_FOUND))
-        );
-
-    }
 }
 
 
