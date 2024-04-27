@@ -7,10 +7,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import study.account.exception.AccountException;
 import study.account.exception.LockException;
 import study.account.type.ErrorCode;
-
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -39,7 +37,7 @@ class LockServiceTest {
 
         // when
         // then
-        assertDoesNotThrow(() -> lockService.lock("123"));
+        assertDoesNotThrow(() -> lockService.lock("22222"));
     }
 
     @Test
@@ -52,7 +50,7 @@ class LockServiceTest {
 
         // when
         LockException exception = assertThrows(LockException.class,
-                () -> lockService.lock("123"));
+                () -> lockService.lock("22222"));
 
         // then
         assertThat(exception.getErrorCode())

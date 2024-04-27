@@ -38,7 +38,7 @@ class LockAopAspectTest {
                 ArgumentCaptor.forClass(String.class);
 
         UseBalance.Request request =
-                new UseBalance.Request(123L, "1234", 1000L);
+                new UseBalance.Request(1L, "22222", 1000L);
 
 
 
@@ -50,8 +50,9 @@ class LockAopAspectTest {
                 .lock(lockArgumentCaptor.capture());
         verify(lockService, times(1))
                 .unlock(unLockArgumentCaptor.capture());
-        assertThat(lockArgumentCaptor.getValue()).isEqualTo("1234");
-        assertThat(unLockArgumentCaptor.getValue()).isEqualTo("1234");
+
+        assertThat(lockArgumentCaptor.getValue()).isEqualTo("22222");
+        assertThat(unLockArgumentCaptor.getValue()).isEqualTo("22222");
     }
 
     @Test
@@ -63,7 +64,7 @@ class LockAopAspectTest {
                 ArgumentCaptor.forClass(String.class);
 
         UseBalance.Request request =
-                new UseBalance.Request(123L, "54321", 1000L);
+                new UseBalance.Request(1L, "22222", 1000L);
         given(proceedingJoinPoint.proceed())
                 .willThrow(new AccountException(ErrorCode.ACCOUNT_NOT_FOUND));
 
@@ -76,8 +77,9 @@ class LockAopAspectTest {
                 .lock(lockArgumentCaptor.capture());
         verify(lockService, times(1))
                 .unlock(unLockArgumentCaptor.capture());
-        assertThat(lockArgumentCaptor.getValue()).isEqualTo("54321");
-        assertThat(unLockArgumentCaptor.getValue()).isEqualTo("54321");
+
+        assertThat(lockArgumentCaptor.getValue()).isEqualTo("22222");
+        assertThat(unLockArgumentCaptor.getValue()).isEqualTo("22222");
     }
 
 }

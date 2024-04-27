@@ -22,28 +22,3 @@ Content-Type: application/json
 GET http://localhost:8080/account?userId=1
 
 
-### 거래 생성
-POST http://localhost:8080/transaction/use
-Content-Type: application/json
-
-{
-  "userId": 1,
-  "accountNumber": "1000000000",
-  "amount": 1500
-}
-
-
-### 거래 취소
-POST http://localhost:8080/transaction/cancel
-Content-Type: application/json
-
-{
-  "transactionId": "3ac06316af9b416496d9deb6258cd550",
-  "accountNumber": "1000000000",
-  "amount": 10
-}
-
-### 거래 확인
-GET http://localhost:8080/transaction?transaction-id=50a20f396c864764af68e69bfb24a61a
-
-

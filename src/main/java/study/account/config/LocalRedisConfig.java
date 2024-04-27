@@ -22,14 +22,16 @@ public class LocalRedisConfig {
     public void startRedis() throws IOException {
         redisServer = new RedisServer(redisPort);
         redisServer.start();
-        log.info("=*=*=*=*=*=*=*= redisServer start =*=*=*=*=*=*=*=");
+
+        log.info("redisServer start");
     }
 
     @PreDestroy
     public void stopRedis() throws IOException {
         if (redisServer.isActive()) {
             redisServer.stop();
-            log.info("=*=*=*=*=*=*=*= redisServer end =*=*=*=*=*=*=*=");
+
+            log.info("redisServer end");
 
         }
     }

@@ -10,6 +10,7 @@ public class LockException extends ServiceException{
     private String errorMessage;
 
     public LockException(ErrorCode errorCode) {
+        super(errorCode);
         this.errorCode = errorCode;
         this.errorMessage = errorCode.getDescription();
     }

@@ -10,7 +10,9 @@ public class UserException extends ServiceException{
     private String errorMessage;
 
     public UserException(ErrorCode errorCode) {
+        super(errorCode);
         this.errorCode = errorCode;
         this.errorMessage = errorCode.getDescription();
     }
+
 }

@@ -10,6 +10,7 @@ public class TransactionException extends ServiceException{
     private String errorMessage;
 
     public TransactionException(ErrorCode errorCode) {
+        super(errorCode);
         this.errorCode = errorCode;
         this.errorMessage = errorCode.getDescription();
     }
